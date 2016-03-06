@@ -1,3 +1,5 @@
+import sbt.Keys._
+
 name := """OAF"""
 
 version := "1.0-SNAPSHOT"
@@ -11,6 +13,11 @@ libraryDependencies ++= Seq(
   cache,
   ws,
   specs2 % Test
+)
+
+libraryDependencies ++= Seq(
+  "mysql" % "mysql-connector-java" % "5.1.21",
+  "com.typesafe.play" %% "play-slick" % "1.1.0"
 )
 
 resolvers += "scalaz-bintray" at "http://dl.bintray.com/scalaz/releases"
