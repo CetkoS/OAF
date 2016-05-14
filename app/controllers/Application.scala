@@ -1,15 +1,48 @@
 package controllers
 
-import play.api._
-import play.api.i18n.Messages
+import forms.AuthenticationForms
+import jp.t2v.lab.play2.auth.LoginLogout
 import play.api.mvc._
-import play.api.Play.current
-import play.api.i18n.Messages.Implicits._
+import scala.concurrent.{ExecutionContext, Future}
 
-class Application extends Controller {
+import scala.concurrent.ExecutionContext.Implicits.global
 
-  def index = Action { implicit request =>
-    Ok(views.html.index("Your new application is ready."))
+
+class Application extends Controller with LoginLogout with AuthConfigImpl {
+
+  /** Alter the login page action to suit your application. */
+  def login = Action { implicit request =>
+    Ok(views.html.login(AuthenticationForms.loginForm))
   }
 
+  /**
+    * Return the `gotoLogoutSucceeded` method's result in the logout action.
+    *
+    * Since the `gotoLogoutSucceeded` returns `Future[Result]`,
+    * you can add a procedure like the following.
+    *
+    *   gotoLogoutSucceeded.map(_.flashing(
+    *     "success" -> "You've been logged out"
+    *   ))
+    */
+  def logout = Action.async { implicit request =>
+    // do something...
+    gotoLogoutSucceeded
+  }
+
+  /**
+    * Return the `gotoLoginSucceeded` method's result in the login action.
+    *
+    * Since the `gotoLoginSucceeded` returns `Future[Result]`,
+    * you can add a procedure like the `gotoLogoutSucceeded`.
+    */
+  def authenticate = Action.async { implicit request =>
+    AuthenticationForms.loginForm.bindFromRequest.fold(
+      formWithErrors => Future.successful(BadRequest(views.html.login(formWithErrors))),
+      user => gotoLoginSucceeded(user.email)// change thisssssssssssssss
+    )
+  }
+
+  @deprecated("it will be deleted since 0.14.x. use authorizationFailed(RequestHeader, User, Option[Authority])")
+  override def authorizationFailed(request: RequestHeader)(implicit context: ExecutionContext): Future[SimpleResult] = ???
 }
