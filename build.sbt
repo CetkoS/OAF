@@ -4,7 +4,11 @@ name := """OAF"""
 
 version := "1.0-SNAPSHOT"
 
-lazy val root = (project in file(".")).enablePlugins(PlayScala)
+lazy val dal = ProjectRef(file("../OAF-DAL"), "oaf-dal")
+
+lazy val ui = (project in file(".")).enablePlugins(PlayScala).aggregate(dal).dependsOn(dal)
+
+
 
 scalaVersion := "2.11.6"
 
